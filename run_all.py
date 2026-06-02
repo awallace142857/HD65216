@@ -160,12 +160,6 @@ sys.exit()
 el = jnp.argmax(log_prob)
 rv_params = llh_max.get_rv_params_one(samples,n_planets,idx=el)
 rv_obs = data['rv_obs']
-inFile = open(name+'_rv.txt','r')
-rv_obs = []
-for line in inFile:
-    entry = line.split(', ')
-    rv_obs.append([float(entry[0]),float(entry[1]),5])
-rv_obs = np.array(rv_obs)
 
 samples,log_prob = pickle.load(open('results/hgca_test'+str(n_planets)+'.pkl','rb'))
 max_ii = np.argmax(log_prob)
