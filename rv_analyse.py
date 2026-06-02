@@ -58,13 +58,6 @@ def run_rv(name,n_planets):
     data = all_data[name]
     M_star = data['mass']
     rv_obs = data['rv_obs']
-    #inFile = open('rv_data_2_planet.txt','r')
-    """inFile = open(name+'_rv.txt','r')
-    rv_obs = []
-    for line in inFile:
-        entry = line.split(', ')
-        rv_obs.append([float(entry[0]),float(entry[1]),3])
-    rv_obs = np.array(rv_obs)"""
     t_rv = rv_obs[:,0]
     rv_data = rv_obs[:,1]
     els = np.where(rv_obs[:,0]<2454000)[0]
