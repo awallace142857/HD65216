@@ -506,7 +506,7 @@ def model_astro(rv_params, hgca_data, gaia_data, hip_epochs, t_gaia, scan_gaia, 
     cosi = numpyro.sample("cos_i", dist.Uniform(-1, 1))
     Omega = numpyro.sample("Omega", dist.Uniform(-2*jnp.pi, 2*jnp.pi))
     inc = jnp.arccos(cosi)
-    params = (rv_params['P'],rv_params['e'],rv_params['q'],inc,Omega,rv_params['omega'],rv_params['T0'],M_star,1000./parallax)
+    params = (rv_params['P'],rv_params['e'],rv_params['q']/jnp.sin(inc),inc,Omega,rv_params['omega'],rv_params['T0'],M_star,1000./parallax)
     mu_com = jnp.array([pmra,pmdec])
     y_sim = hgca_model_vector(params,mu_com,t_gaia,hip_epochs,scan_gaia,gaia_data['ra'],gaia_data['dec'])
     gaia_sim = gaia_model(params,t_gaia,scan_gaia,mu_com,gaia_data['ra'],gaia_data['dec'])
