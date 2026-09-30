@@ -7,7 +7,7 @@ from numpyro.infer import MCMC, NUTS, init_to_value
 import matplotlib.pyplot as plt
 import pickle
 import os,sys
-import rv_analyse,llh_max,hgca_inference
+import rv_inference,llh_max,hgca_inference
 import gaiascanlaw
 from astropy.timeseries import LombScargle
 def single_eval(inc, Omega, pmra, pmdec, const):
@@ -115,7 +115,8 @@ hgca_data['Cinv_gaia'] = np.linalg.inv(hgca_data['C_gaia'])
 t_hip = llh_max.find_hip('hip_epochs.csv',data['hg_obs']['hip_id'])
 t_gaia,scan_gaia = gaiascanlaw.scanlaw(data['hg_obs']['gaia_ra'],data['hg_obs']['gaia_dec'],tstart=gaiascanlaw.tstart,tend=gaiascanlaw.tdr3)
 t_dr4,scan_dr4 = gaiascanlaw.scanlaw(data['hg_obs']['gaia_ra'],data['hg_obs']['gaia_dec'],tstart=gaiascanlaw.tstart,tend=gaiascanlaw.tdr4)
-M_star = data['mass']    
+M_star = data['mass']
+rv_inference.run_rv_inference_2planet(name, n_planets, data['rv_obs'], M_star=data['mass'])
 samples_rv,log_prob_rv = pickle.load(open('samples_rv_'+name+'.pkl','rb'))
 el = jnp.argmax(log_prob_rv)
 els = np.where(log_prob_rv<np.max(log_prob_rv))[0]
