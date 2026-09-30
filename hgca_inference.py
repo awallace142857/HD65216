@@ -43,19 +43,19 @@ def rv_llh(P,e,q,omega,M0,offset,const):
     llh_val = llh_max.loglike_rv(params, rv_data)
     return llh_val
 def calc_offset(t,scan_angle,ra,dec,params,mu_map):
-	cond = jnp.max(t) > 2019
-	epoch = jnp.where(cond, 2017.5, 2016.0)
-	x_orbit, y_orbit = sky_position(t, params)
-	x_star, y_star = star_model(t, ra, dec, 0, 0, params[8], mu_map[0], mu_map[1], epoch)
-	x = x_orbit + x_star
-	y = y_orbit + y_star
-	x_AL = x * jnp.sin(scan_angle) + y * jnp.cos(scan_angle)
-	A = gaia_matrix_AL(t,scan_angle,ra,dec,epoch)
-	params_est = gaia_params_iter(x_AL,A,0.216,n_iter=10)
-	(x_model,y_model) = star_model(t, ra, dec, params_est[0],params_est[1],1000./params_est[2],params_est[3],params_est[4],epoch)
-	x_AL_model = x_model*jnp.sin(scan_angle)+y_model*jnp.cos(scan_angle)
-	x_diff = x_AL-x_AL_model
-	return x_diff
+    cond = jnp.max(t) > 2019
+    epoch = jnp.where(cond, 2017.5, 2016.0)
+    x_orbit, y_orbit = sky_position(t, params)
+    x_star, y_star = star_model(t, ra, dec, 0, 0, params[8], mu_map[0], mu_map[1], epoch)
+    x = x_orbit + x_star
+    y = y_orbit + y_star
+    x_AL = x * jnp.sin(scan_angle) + y * jnp.cos(scan_angle)
+    A = gaia_matrix_AL(t,scan_angle,ra,dec,epoch)
+    params_est = gaia_params_iter(x_AL,A,0.216,n_iter=10)
+    (x_model,y_model) = star_model(t, ra, dec, params_est[0],params_est[1],1000./params_est[2],params_est[3],params_est[4],epoch)
+    x_AL_model = x_model*jnp.sin(scan_angle)+y_model*jnp.cos(scan_angle)
+    x_diff = x_AL-x_AL_model
+    return x_diff
 
 def true_anomaly(t_rel,n,e,M0):
     M = n * t_rel + M0
@@ -273,35 +273,35 @@ def hgca_loglike(params, mu_com, y_obs, Cinv, tG_all, tH_all):
     return -0.5 * (r @ Cinv @ r)
 
 def gaia_model(params,tG_all,scan_angle,mu_com,ra,dec,al_err=0.18):
-	x_orbit, y_orbit = sky_position(tG_all, params)
-	cond = jnp.max(tG_all) > 2019
-	epoch = jnp.where(cond, 2017.5, 2016.0)
-	"""if max(tG_all)>2019:
-		epoch = 2017.5
-	else:
-		epoch = 2016"""
-	x_star, y_star = star_model(tG_all, ra, dec, 0, 0, params[8], mu_com[0], mu_com[1], epoch)
-	x = x_orbit + x_star
-	y = y_orbit + y_star
-	x_AL = x * jnp.sin(scan_angle) + y * jnp.cos(scan_angle)
-	A = gaia_matrix_AL(tG_all,scan_angle,ra,dec,epoch)
-	params_est = gaia_params_iter(x_AL,A,al_err,n_iter=1)
-	return params_est
+    x_orbit, y_orbit = sky_position(tG_all, params)
+    cond = jnp.max(tG_all) > 2019
+    epoch = jnp.where(cond, 2017.5, 2016.0)
+    """if max(tG_all)>2019:
+        epoch = 2017.5
+    else:
+        epoch = 2016"""
+    x_star, y_star = star_model(tG_all, ra, dec, 0, 0, params[8], mu_com[0], mu_com[1], epoch)
+    x = x_orbit + x_star
+    y = y_orbit + y_star
+    x_AL = x * jnp.sin(scan_angle) + y * jnp.cos(scan_angle)
+    A = gaia_matrix_AL(tG_all,scan_angle,ra,dec,epoch)
+    params_est = gaia_params_iter(x_AL,A,al_err,n_iter=1)
+    return params_est
 
 def gaia_offset(params,tG_all,scan_angle,mu_com,ra,dec):
-	x_orbit, y_orbit = sky_position(tG_all, params)
-	#cond = jnp.max(tG_all) > 2019
-	#epoch = jnp.where(cond, 2017.5, 2016.0)
-	tmax = jnp.max(tG_all)
-	epoch = jnp.where(tmax > 2021,2020.0,jnp.where(tmax > 2019,2017.5,2016.0))
-	x_star, y_star = star_model(tG_all, ra, dec, 0, 0, params[8], mu_com[0], mu_com[1], epoch)
-	x = x_orbit + x_star
-	y = y_orbit + y_star
-	x_AL = x * jnp.sin(scan_angle) + y * jnp.cos(scan_angle)
-	A = gaia_matrix_AL(tG_all,scan_angle,ra,dec,epoch)
-	params_est = gaia_params_iter(x_AL,A,0.2,n_iter=1)
-	x_AL0 = A @ params_est
-	return x_AL-x_AL0
+    x_orbit, y_orbit = sky_position(tG_all, params)
+    #cond = jnp.max(tG_all) > 2019
+    #epoch = jnp.where(cond, 2017.5, 2016.0)
+    tmax = jnp.max(tG_all)
+    epoch = jnp.where(tmax > 2021,2020.0,jnp.where(tmax > 2019,2017.5,2016.0))
+    x_star, y_star = star_model(tG_all, ra, dec, 0, 0, params[8], mu_com[0], mu_com[1], epoch)
+    x = x_orbit + x_star
+    y = y_orbit + y_star
+    x_AL = x * jnp.sin(scan_angle) + y * jnp.cos(scan_angle)
+    A = gaia_matrix_AL(tG_all,scan_angle,ra,dec,epoch)
+    params_est = gaia_params_iter(x_AL,A,0.2,n_iter=1)
+    x_AL0 = A @ params_est
+    return x_AL-x_AL0
 def hip_matrix(tH_all,sinscan,cosscan,plx_factor):
     A = jnp.column_stack((sinscan,
                     cosscan,
@@ -346,11 +346,11 @@ def hip_model(params,tH_all,sinscan,cosscan,plx_factor,mu_com):
     A = hip_matrix(tH_all,sinscan,cosscan,plx_factor)
     params_est = hip_params_iter(x_AL, A, 1.0, n_iter=1)
     return params_est
-	
+    
 def gaia_loglike(params,tG_all,scan_angle,mu_com,hgca_data,Cinv):
-	r = hgca_data['gaia_obs'][2:7]-gaia_model(params,tG_all,scan_angle,mu_com,hgca_data['gaia_obs'][0],hgca_data['gaia_obs'][1])
-	return -0.5 * (r @ Cinv @ r)
-	
+    r = hgca_data['gaia_obs'][2:7]-gaia_model(params,tG_all,scan_angle,mu_com,hgca_data['gaia_obs'][0],hgca_data['gaia_obs'][1])
+    return -0.5 * (r @ Cinv @ r)
+    
 def loglike_total(params, mu_com, hgca_data, tG_all, tH_all, scan_angle, rv_data=None):
     # --- HGCA ---
     ll = hgca_loglike(params, mu_com, hgca_data["y_obs"], hgca_data["Cinv"], tG_all, tH_all)
@@ -498,73 +498,43 @@ def rv_model(f, P, e, q, omega, M_star, inc):
     # RV semi-amplitude
     K = (1.496e11/24/3600) * ((2 * jnp.pi * a) / P) * (q/(1+q)) * jnp.sin(inc) / jnp.sqrt(1 - e ** 2)
     return K * (jnp.cos(omega + f) + e * jnp.cos(omega))
-def model_astro(rv_params, hgca_data, gaia_data, hip_epochs, t_gaia, scan_gaia, M_star=1.0, return_epochs=False,return_dr4_sim=False):
-    JD0 = 2457388.5
-    parallax = gaia_data['parallax']#numpyro.sample("parallax", dist.Uniform(gaia_data['parallax']-10, gaia_data['parallax']+10))
-    pmra = numpyro.sample("pmra", dist.Normal(gaia_data['pmra'],0.2))
-    pmdec = numpyro.sample("pmdec", dist.Normal(gaia_data['pmdec'],0.2))
-    cosi = numpyro.sample("cos_i", dist.Uniform(-1, 1))
-    Omega = numpyro.sample("Omega", dist.Uniform(-2*jnp.pi, 2*jnp.pi))
-    inc = jnp.arccos(cosi)
-    params = (rv_params['P'],rv_params['e'],rv_params['q']/jnp.sin(inc),inc,Omega,rv_params['omega'],rv_params['T0'],M_star,1000./parallax)
-    mu_com = jnp.array([pmra,pmdec])
-    y_sim = hgca_model_vector(params,mu_com,t_gaia,hip_epochs,scan_gaia,gaia_data['ra'],gaia_data['dec'])
-    gaia_sim = gaia_model(params,t_gaia,scan_gaia,mu_com,gaia_data['ra'],gaia_data['dec'])
-    #gaia_obs = jnp.array([0,0,gaia_data['parallax'],gaia_data['pmra'],gaia_data['pmdec']])
-    #numpyro.sample("gaia_sim",dist.MultivariateNormal(loc=gaia_sim, precision_matrix=hgca_data['Cinv_gaia']),obs=gaia_obs)
-    numpyro.sample("hgca_pm",dist.MultivariateNormal(loc=y_sim, precision_matrix=hgca_data['Cinv']),obs=hgca_data['y_obs'])
-    numpyro.deterministic('hgca_sim',y_sim)
-    numpyro.deterministic('gaia_params_dr3',gaia_sim)
-    if return_epochs:
-        x_AL = gaia_offset(params,t_gaia,scan_gaia,mu_com,gaia_data['ra'],gaia_data['dec'])
-        numpyro.deterministic('x_dr3',x_AL)
-        t_dr4,scan_dr4 = gaiascanlaw.scanlaw(gaia_data['ra'],gaia_data['dec'],tstart=gaiascanlaw.tstart,tend=gaiascanlaw.tdr4)
-        x_AL = gaia_offset(params,t_dr4,scan_dr4,mu_com,gaia_data['ra'],gaia_data['dec'])
-        numpyro.deterministic('x_dr4',x_AL)
-        t_dr5,scan_dr5 = gaiascanlaw.scanlaw(gaia_data['ra'],gaia_data['dec'],tstart=gaiascanlaw.tstart,tend=gaiascanlaw.tdr5)
-        x_AL = gaia_offset(params,t_dr5,scan_dr5,mu_com,gaia_data['ra'],gaia_data['dec'])
-        numpyro.deterministic('x_dr5',x_AL)
-    if return_dr4_sim:
-        t_dr4,scan_dr4 = gaiascanlaw.scanlaw(gaia_data['ra'],gaia_data['dec'],tstart=gaiascanlaw.tstart,tend=gaiascanlaw.tdr4)
-        dr4_gaia = gaia_model(params,t_dr4,scan_dr4,mu_com,gaia_data['ra'],gaia_data['dec'],al_err=0.14)
-        numpyro.deterministic('gaia_params_dr4',dr4_gaia)
     
-def model_all(rv_obs, hgca_data, gaia_data, hip_epochs, t_gaia, scan_gaia, M_star=1.0, n_planets=1, return_epochs=False):
+def model_all(rv_obs, hgca_data, gaia_data, hip_epochs, t_gaia, scan_gaia, M_star=1.0, n_planets=1, return_epochs=False,return_dr4_sim=False):
     JD0 = 2457388.5
     t_rv = rv_obs[:,0]
     rv_data = rv_obs[:,1]
     t_ref = 0.0
     parallax = gaia_data['parallax']#numpyro.sample("parallax", dist.Uniform(gaia_data['parallax']-10, gaia_data['parallax']+10))
-    pmra = numpyro.sample("pmra", dist.Uniform(gaia_data['pmra']-40, gaia_data['pmra']+40))
-    pmdec = numpyro.sample("pmdec", dist.Uniform(gaia_data['pmdec']-40, gaia_data['pmdec']+40))
+    pmra = numpyro.sample("pmra", dist.Uniform(gaia_data['pmra']-5, gaia_data['pmra']+5))
+    pmdec = numpyro.sample("pmdec", dist.Uniform(gaia_data['pmdec']-5, gaia_data['pmdec']+5))
     cosi = numpyro.sample("cos_i", dist.Uniform(-1, 1))
-    Omega = numpyro.sample("Omega", dist.Uniform(-2*jnp.pi, 2*jnp.pi))
+    Omega = numpyro.sample("Omega", dist.Uniform(0, 2*jnp.pi))
     inc = jnp.arccos(cosi)
     P = jnp.zeros(n_planets)
     e = jnp.zeros(n_planets)
     q = jnp.zeros(n_planets)
     omega = jnp.zeros(n_planets)
     M0 = jnp.zeros(n_planets)
-    T0 = jnp.zeros(n_planets)
-    if np.min(t_rv)<2455000 and np.max(t_rv)>2455000:
-        diff = True
-        offset1 = numpyro.sample("offset1", dist.Uniform(-2000, 2000))
-        offset2 = numpyro.sample("offset2", dist.Uniform(-2000, 2000))
-        els1 = np.where(t_rv<=2455000)[0]
-        els2 = np.where(t_rv>2455000)[0]
-        rv1 = jnp.ones(len(els1))*offset1
-        rv2 = jnp.ones(len(els2))*offset2
-        f1 = jnp.zeros((n_planets,len(els1)))
-        f2 = jnp.zeros((n_planets,len(els2)))
-    else:
-        diff = False    
-        offset = numpyro.sample("offset", dist.Uniform(-2000, 2000))
-        rv = jnp.ones(len(t_rv))*offset
-        f = jnp.zeros((n_planets,len(t_rv)))
+    T0 = jnp.zeros(n_planets)  
+	offset1 = numpyro.sample("offset1", dist.Uniform(-100,100))
+	offset2 = numpyro.sample("offset2", dist.Uniform(-100,100))
+	offset3 = numpyro.sample("offset3", dist.Uniform(-100,100))
+	times = rv_obs[:, 0]
+	offset = jnp.where(
+		times < 2452849,
+		offset1,
+		jnp.where(
+			times < 2458000,
+			offset2,
+			offset3,
+		),
+	)
+	rv = offset
+	f = jnp.zeros((n_planets,len(t_rv)))
     for ii in range(n_planets):
         logP = numpyro.sample("logP"+str(ii+1), dist.Uniform(jnp.log(100), jnp.log(10000)))
         P = P.at[ii].set(jnp.exp(logP))
-        e = e.at[ii].set(numpyro.sample("e"+str(ii+1), dist.Beta(1.0, 3.0)))
+        e = e.at[ii].set(numpyro.sample("e"+str(ii+1), dist.Beta(0.867, 3.03)))
         logq = numpyro.sample("logq"+str(ii+1),dist.Uniform(jnp.log(2e-4), jnp.log(1e-1)))
         q = q.at[ii].set(jnp.exp(logq))
         omega = omega.at[ii].set(numpyro.sample("omega"+str(ii+1), dist.Uniform(-2*jnp.pi, 2*jnp.pi)))
@@ -579,29 +549,29 @@ def model_all(rv_obs, hgca_data, gaia_data, hip_epochs, t_gaia, scan_gaia, M_sta
         else:
             f = f.at[ii].set(true_anomaly(t_rv - JD0 - t_ref, n, e[ii], M0[ii]))
             rv = rv+rv_model(f[ii], P[ii], e[ii], q[ii], omega[ii], M_star, inc)
-    if diff:
-        jitter1 = numpyro.sample("jitter1", dist.HalfNormal(20.0))
-        jitter2 = numpyro.sample("jitter2", dist.HalfNormal(20.0))
-        rv_err1 = jnp.sqrt(rv_obs[els1,2]**2 + jitter1**2)
-        rv_err2 = jnp.sqrt(rv_obs[els2,2]**2 + jitter2**2)
-        numpyro.sample("RV1", dist.Normal(rv1, rv_err1), obs=rv_data[els1])
-        numpyro.deterministic("RV_sim1", rv1)
-        numpyro.sample("RV2", dist.Normal(rv2, rv_err2), obs=rv_data[els2])
-        numpyro.deterministic("RV_sim2", rv2)
-    else:
-        jitter = numpyro.sample("jitter", dist.HalfNormal(20.0))
-        rv_err = jnp.sqrt(rv_obs[:,2]**2 + jitter**2)
-        numpyro.sample("RV", dist.Normal(rv, rv_err), obs=rv_data)
-        numpyro.deterministic("RV_sim", rv)
+	jitter1 = numpyro.sample("jitter1", dist.Uniform(0,20))
+	jitter2 = numpyro.sample("jitter2", dist.Uniform(0,20))
+	jitter3 = numpyro.sample("jitter3", dist.Uniform(0,20))
+	times = rv_obs[:, 0]
+	jitter = jnp.where(
+		times < 2452849,
+		jitter1,
+		jnp.where(
+			times < 2458000,
+			jitter2,
+			jitter3,
+		),
+	)
+	rv_err = jnp.sqrt(rv_obs[:, 2]**2 + jitter**2)
+	numpyro.sample("RV", dist.Normal(rv, rv_err), obs=rv_data)
+	numpyro.deterministic("RV_sim", rv)
     params = (P,e,q,inc,Omega,omega,T0,M_star,1000./parallax)
     mu_com = jnp.array([pmra,pmdec])
     y_sim = hgca_model_vector(params,mu_com,t_gaia,hip_epochs,scan_gaia,gaia_data['ra'],gaia_data['dec'])
     gaia_sim = gaia_model(params,t_gaia,scan_gaia,mu_com,gaia_data['ra'],gaia_data['dec'])
-    #gaia_obs = jnp.array([0,0,gaia_data['parallax'],gaia_data['pmra'],gaia_data['pmdec']])
-    #numpyro.sample("gaia_sim",dist.MultivariateNormal(loc=gaia_sim, precision_matrix=hgca_data['Cinv_gaia']),obs=gaia_obs)
     numpyro.sample("hgca_pm",dist.MultivariateNormal(loc=y_sim, precision_matrix=hgca_data['Cinv']),obs=hgca_data['y_obs'])
     numpyro.deterministic('hgca_sim',y_sim)
-    numpyro.deterministic('gaia_params',gaia_sim)
+    numpyro.deterministic('gaia_params_dr3',gaia_sim)
     numpyro.deterministic("T0", T0)
     if return_epochs:
         x_AL = gaia_offset(params,t_gaia,scan_gaia,mu_com,gaia_data['ra'],gaia_data['dec'])
@@ -612,22 +582,24 @@ def model_all(rv_obs, hgca_data, gaia_data, hip_epochs, t_gaia, scan_gaia, M_sta
         t_dr5,scan_dr5 = gaiascanlaw.scanlaw(gaia_data['ra'],gaia_data['dec'],tstart=gaiascanlaw.tstart,tend=gaiascanlaw.tdr5)
         x_AL = gaia_offset(params,t_dr5,scan_dr5,mu_com,gaia_data['ra'],gaia_data['dec'])
         numpyro.deterministic('x_dr5',x_AL)
+    if return_dr4_sim:
+        t_dr4,scan_dr4 = gaiascanlaw.scanlaw(gaia_data['ra'],gaia_data['dec'],tstart=gaiascanlaw.tstart,tend=gaiascanlaw.tdr4)
+        dr4_gaia = gaia_model(params,t_dr4,scan_dr4,mu_com,gaia_data['ra'],gaia_data['dec'],al_err=0.14)
+        numpyro.deterministic('gaia_params_dr4',dr4_gaia)
 
 all_data = pickle.load(open('all_data.pkl','rb'))
-def run_astro(name,n_planet):
-    #samples,log_prob = pickle.load(open('results/samples_'+name+'_rv_test_'+str(n_planet)+'.pkl','rb'))
-    samples,log_prob = pickle.load(open('results/rv_good.pkl','rb'))
+def run_astro(name,n_planet,el=0):
+    samples,log_prob = pickle.load(open('samples_rv_'+name+'.pkl','rb'))
     data = all_data[name]
-    rv_obs = data['rv_obs']
-    rv_params = {'P':np.exp(np.median(samples['logP2'])),'e':np.median(samples['e2']),'q':np.exp(np.median(samples['logq2'])),'omega':np.median(samples['omega2']),'T0':np.median(samples['T02'])}
+    rv_obs = pickle.load(open('new_rv.pkl','rb'))#data['rv_obs']
     P = [jnp.exp(samples['logP1']),jnp.exp(samples['logP2'])]
     e = [samples['e1'],samples['e2']]
     q = [jnp.exp(samples['logq1']),jnp.exp(samples['logq2'])]
     omega = [samples['omega1'],samples['omega2']]
     M0 = [samples['M01'],samples['M02']]
-    offset = samples['offset']
+    #offset = samples['offset']
     el = jnp.argmax(log_prob)
-    rv_params = llh_max.get_rv_params_one(samples,n_planet,idx=el)
+    rv_params = llh_max.get_rv_params_one(samples,2,idx=el)
     frequency, power = LombScargle(rv_obs[:,0], rv_obs[:,1]).autopower(samples_per_peak=10)
     period = 1./frequency[np.argmax(power)]
     hgca_data = {}
@@ -636,21 +608,18 @@ def run_astro(name,n_planet):
     hgca_data['C_gaia'] = build_gaia_covariance(data)
     hgca_data['gaia_obs'] = np.array([data['ra'],data['dec'],0,0,data['parallax'],data['pmra'],data['pmdec']])
     t_hip,pf_hip,sin_hip,cos_hip = find_hip('hip_epochs.csv',data['hg_obs']['hip_id'])
-    #t_hip = find_hip('hip_'+name+'.csv')
     t_gaia,scan_gaia = gaiascanlaw.scanlaw(data['hg_obs']['gaia_ra'],data['hg_obs']['gaia_dec'],tstart=gaiascanlaw.tstart,tend=gaiascanlaw.tdr3)
     t_dr4,scan_dr4 = gaiascanlaw.scanlaw(data['hg_obs']['gaia_ra'],data['hg_obs']['gaia_dec'],tstart=gaiascanlaw.tstart,tend=gaiascanlaw.tdr4)
     hgca_data['Cinv'] = np.linalg.inv(hgca_data['C'])
     hgca_data['Cinv_gaia'] = np.linalg.inv(hgca_data['C_gaia'])
     M_star = data['mass']
-    init_values = {"cos_i": 0, "Omega": 0, "pmra": hgca_data['y_obs'][0], "pmdec": hgca_data['y_obs'][1]}
-    #init_values = {"logP1":jnp.log(period),"logq1":jnp.log(1e-3),"M01":0,"e1":0.01,"offset1":0,"offset2":0,"offset":0,"cos_i": 0, "Omega": 0, "pmra": hgca_data['y_obs'][0], "pmdec": hgca_data['y_obs'][1]}
-    kernel = NUTS(model_astro,init_strategy=init_to_value(values=init_values))
-    #kernel = NUTS(model_all,init_strategy=init_to_value(values=init_values))
+    init_values = {"logP1":jnp.log(rv_params['P'][1]),"logq1":jnp.log(rv_params['q'][1]),"logP2":jnp.log(rv_params['P'][1]),"logq2":jnp.log(rv_params['q'][1]),"M01":0.0,"M02":0.0,"e1":rv_params['e'][1],"e2":rv_params['e'][1],"omega1":rv_params['omega'][1],"offset1":-20,"offset2":-20,"offset3":-20,"cos_i": 0, "Omega": 0, "pmra": hgca_data['y_obs'][0], "pmdec": hgca_data['y_obs'][1]}
+    kernel = NUTS(model_all,init_strategy=init_to_value(values=init_values))
     mcmc = MCMC(kernel, num_warmup=1000, num_samples=10000)
-    mcmc.run(jax.random.PRNGKey(1), rv_params=rv_params, hgca_data=hgca_data, gaia_data=data, hip_epochs=(t_hip,sin_hip,cos_hip,pf_hip), t_gaia=t_gaia, scan_gaia=scan_gaia, M_star=M_star, return_epochs=True, return_dr4_sim=True, extra_fields=("potential_energy",))
-    #mcmc.run(jax.random.PRNGKey(1), rv_obs=rv_obs, hgca_data=hgca_data, gaia_data=data, hip_epochs=(t_hip,sin_hip,cos_hip,pf_hip), t_gaia=t_gaia, scan_gaia=scan_gaia, M_star=M_star, n_planets=1, return_epochs=True, extra_fields=("potential_energy",))
+    mcmc.run(jax.random.PRNGKey(1), rv_obs=rv_obs, hgca_data=hgca_data, gaia_data=data, hip_epochs=(t_hip,sin_hip,cos_hip,pf_hip), t_gaia=t_gaia, scan_gaia=scan_gaia, M_star=M_star, n_planets=n_planet, return_epochs=True, return_dr4_sim=True, extra_fields=("potential_energy",))
     mcmc.print_summary()
     samples = mcmc.get_samples()
     extra = mcmc.get_extra_fields()
     log_prob = -extra["potential_energy"]
-    pickle.dump((samples,log_prob),open('results/samples_hgca_'+name+'.pkl','wb'))
+    pickle.dump((samples,log_prob),open('samples_hgca_'+name+'.pkl','wb'))
+    return (samples,log_prob)
